@@ -46,7 +46,7 @@ const AppIntro = ({ navigation }) => {
   );
 
   const onDone = () => {
-    navigation.replace('Home'); // Navigate to login after intro
+    navigation.replace('ChoicePage'); // Navigate to login after intro
   };
 
   return (
