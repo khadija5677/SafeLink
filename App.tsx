@@ -1,27 +1,11 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {Main} from './src/Main';
-import {
-  StyleSheet,
-} from 'react-native';
+import Main from './src/Main'; // Import without braces
+import { StyleSheet } from 'react-native';
 
-const App = () => {
-  return (
-    <Main />
-  );
+const App: React.FC = () => {
+  return <Main />;
+};
 
-}
- 
-
-const styles = StyleSheet.create({
- 
-});
+const styles = StyleSheet.create({});
 
 export default App;

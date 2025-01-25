@@ -1,11 +1,22 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import AppNavigator from './Navigation/AppNavigator'
-export const Main = () => {
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import ResponsiveText from './Components/ResponsiveText';
 
-    return(
-        <NavigationContainer>
-            <AppNavigator />
-        </NavigationContainer>
-    )
-}
+const Main = () => {
+  return (
+    <View style={styles.container}>
+      <ResponsiveText size={10}>Responsive Font Size</ResponsiveText>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+ 
+});
+
+export default Main;
