@@ -1,3 +1,8 @@
 <resources>
+    <!-- Google Maps API Key -->
+    <string name="google_maps_key">AIzaSyAGUi5WrXDr5IKQOGWzGVcEvsH8SROW4-E</string>
+
+    <!-- App Name -->
     <string name="app_name">SafeLink</string>
 </resources>
+

@@ -6,6 +6,7 @@ import TextInputComponent from './Components/TextInput'; // Import TextInput com
 import ImageComponent from './Components/Image'; // Import ImageComponent
 import ImageBackgroundComponent from './Components/ImageBackground';
 import TextComponent from './Components/Text';
+import MapComponent from './Components/Map';
 import AppNavigator from './Navigation/AppNavigator';
 //import ResponsiveText from './Components/ResponsiveText'; // import ResponsiveText component
 
@@ -20,7 +21,8 @@ const Main = () => {
           {/* <TextInputComponent /> */}
           {/* <ImageComponent /> */}
           {/* <ImageBackgroundComponent /> */}
-          <TextComponent />
+          {/* <TextComponent /> */}
+          < MapComponent/>
           {/* <AppNavigator /> */}
         </View>
         {/* <View style={styles.footer}>
