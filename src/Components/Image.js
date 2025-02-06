@@ -9,7 +9,7 @@ const ImageComponent = () => {
       {/* Local Image */}
       <Text style={styles.label}>Local Image:</Text>
       <Image
-        source={require('../../assests/images/abc.jpg')} // Replace with your local image path
+        source={require('../../assets/images/abc.jpg')} // Replace with your local image path
         style={styles.image}
       />
 

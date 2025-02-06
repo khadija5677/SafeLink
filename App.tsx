@@ -1,31 +1,20 @@
 import React from 'react';
-import { colors } from './src/Utils/colors'; // Import colors
-import Main from './src/Main'; // Import Main component
-import { StyleSheet, View, Text } from 'react-native'; // React Native components
+import { StyleSheet, View } from 'react-native'; // React Native components
+import AppNavigator from './src/Navigation/AppNavigator'; // Import AppNavigator
 
 const App: React.FC = () => {
   // Styles for React Native
   const styles = StyleSheet.create({
     appContainer: {
-      backgroundColor: colors.background, // Using colors from colors.js
-      color: colors.text,
-      height: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
-      display: 'flex', // Mimicking web-like layout
-    },
-    header: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: colors.text,
+      flex: 1,  // Ensure the container takes up the full screen
     },
   });
 
   return (
-    // <View style={styles.appContainer}>
-    //   <Text style={styles.header}>Welcome to SafeLink</Text>
-      <Main />
-    // </View>
+    <View style={styles.appContainer}>
+      {/* AppNavigator takes care of the navigation and rendering of screens */}
+      <AppNavigator />
+    </View>
   );
 };
 

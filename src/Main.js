@@ -7,31 +7,47 @@ import ImageComponent from './Components/Image'; // Import ImageComponent
 import ImageBackgroundComponent from './Components/ImageBackground';
 import TextComponent from './Components/Text';
 import MapComponent from './Components/Map';
+import LocationTracker from './Components/LiveLocation';
 import AppNavigator from './Navigation/AppNavigator';
+import AppIntro from './Screens/AppIntroSlider';
 //import ResponsiveText from './Components/ResponsiveText'; // import ResponsiveText component
 
 const Main = () => {
   return (
+    <View>
     <NavigationContainer>
-      <SafeAreaView style={styles.container}>
+
+      {/* <SafeAreaView style={styles.container}> */}
+        {/* Uncomment below if you want to include the header */}
         {/* <View style={styles.header}>
           <Text style={styles.title}>React Native Text Input </Text>
         </View> */}
-        <View style={styles.content}>
+
+        {/* <View style={styles.content}> */}
+          {/* Uncomment the components you need */}
           {/* <TextInputComponent /> */}
           {/* <ImageComponent /> */}
           {/* <ImageBackgroundComponent /> */}
           {/* <TextComponent /> */}
-          < MapComponent/>
+
+          {/* Map and Live Location Components */}
+          {/* <MapComponent />
+          <LocationTracker /> */}
+          < AppIntro />
+
+          {/* Uncomment below to include AppNavigator */}
           {/* <AppNavigator /> */}
-        </View>
+        {/* </View> */}
+
+        {/* Uncomment below if you want to include the footer */}
         {/* <View style={styles.footer}>
           <ResponsiveText size={2} style={styles.footerText}>
             Responsive Font Size
           </ResponsiveText>
         </View> */}
-      </SafeAreaView>
+      {/* </SafeAreaView> */}
     </NavigationContainer>
+    </View>
   );
 };
 
@@ -55,8 +71,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    //paddingHorizontal: 20,
+    // paddingHorizontal: 20,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   footer: {
     padding: 20,

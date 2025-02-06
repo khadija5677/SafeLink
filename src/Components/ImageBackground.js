@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ImageBackground } from 'react-native';
 const ImageBackgroundComponent = (props) => {
   return (
     <ImageBackground
-      source={require('../../assests/images/background.jpg')} // Update path as per your project
+      source={require('../../assets/images/background.jpg')} // Update path as per your project
       style={styles.background}
       resizeMode="cover" // Ensures the image covers the entire background
     >
