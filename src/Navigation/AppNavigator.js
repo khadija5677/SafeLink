@@ -5,8 +5,8 @@ import AppIntroSlider from '../Screens/AppIntroSlider'; // Import your AppIntroS
 import LoginSelectionScreen from '../Screens/LoginSelection'; // Import the LoginSelectionScreen
 import DaughterLogin from '../Screens/DaughterLogin'; // Uncomment when DaughterLoginScreen is ready
 import ParentLogin from '../Screens/ParentLogin';
-//import Dashboard from '../Screens/Dashboard'; // Replace with your Dashboard component
-
+import PDashboard from '../Screens/ParentDashboard'; // Replace with your Dashboard component
+import TrustedContacts from '../Screens/TrustedContacts';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -28,17 +28,22 @@ const AppNavigator = () => {
           component={DaughterLogin}
           options={{ headerShown: false }} // Hide header for LoginSelectionScreen
         />
-        {/* <Stack.Screen
+        <Stack.Screen
           name="ParentLoginScreen"
           component={ParentLogin}
           options={{ headerShown: false }} // Hide header for LoginSelectionScreen
-        /> */}
+        />
     
-        {/* <Stack.Screen
-          name="Dashboard"
-          component={Dashboard}
+        <Stack.Screen
+          name="ParentDashboard"
+          component={PDashboard}
           options={{ headerShown: false }} // Hide header for Dashboard
-        /> */}
+        />
+        <Stack.Screen
+          name="TContacts"
+          component={TrustedContacts}
+          options={{ headerShown: false }} // Hide header for Dashboard
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
