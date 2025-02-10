@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ImageBackground } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import LinearGradient from 'react-native-linear-gradient';
 
 const ParentLogin = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -15,10 +16,13 @@ const ParentLogin = ({ navigation }) => {
 
   const validateFields = () => {
     let newErrors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!name) newErrors.name = 'This is a compulsory field.';
     if (!relation) newErrors.relation = 'Please select a relation.';
-    if (!email.includes('@')) newErrors.email = 'Enter a valid email.';
+    if (!emailRegex.test(email)) newErrors.email = 'Enter a valid email.';
     if (contactDetails.length !== 10) newErrors.contactDetails = 'Enter a 10-digit number.';
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -43,7 +47,13 @@ const ParentLogin = ({ navigation }) => {
   };
 
   return (
-    <ImageBackground source={require('../../assets/images/image.png')} style={styles.background} resizeMode="repeat">
+    <LinearGradient 
+      colors={['#64B5F6', '#FF80AB']} 
+      // start={{ x: 0, y: 1 }} 
+      // end={{ x: 1, y: 0 }} 
+      style={styles.container}
+    >
+    
       <View style={styles.overlay}>
         <Text style={styles.title}>Parent Login</Text>
 
@@ -103,24 +113,22 @@ const ParentLogin = ({ navigation }) => {
           </>
         )}
       </View>
-    </ImageBackground>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  background: {
+  container: {
     flex: 1,
-    width: '100%',
-    height: '100%',
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Optional: White overlay for better readability
+    backgroundColor: 'rgba(255, 255, 255, 0.55)', // Light overlay for readability
     padding: 20,
     justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,

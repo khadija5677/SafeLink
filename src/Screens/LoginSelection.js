@@ -1,174 +1,144 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ImageBackground } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import LottieView from 'lottie-react-native';
 
-const ParentLogin = ({ navigation }) => {
-  const [name, setName] = useState('');
-  const [relation, setRelation] = useState('');
-  const [email, setEmail] = useState('');
-  const [contactDetails, setContactDetails] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
-  const [sentCode, setSentCode] = useState(null);
-  const [isCodeSent, setIsCodeSent] = useState(false);
+const { width, height } = Dimensions.get('window');
 
-  const [errors, setErrors] = useState({});
+const LoginSelectionScreen = ({ navigation }) => {
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
 
-  const validateFields = () => {
-    let newErrors = {};
-    if (!name) newErrors.name = 'This is a compulsory field.';
-    if (!relation) newErrors.relation = 'Please select a relation.';
-    if (!email.includes('@')) newErrors.email = 'Enter a valid email.';
-    if (contactDetails.length !== 10) newErrors.contactDetails = 'Enter a 10-digit number.';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleDaughterLogin = () => {
+    setSelectedOption('daughter');
+    setIsButtonEnabled(true);
   };
 
-  const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
-
-  const sendVerificationCode = () => {
-    if (!validateFields()) return;
-    const code = generateCode();
-    setSentCode(code);
-    setIsCodeSent(true);
-    Alert.alert('Verification Code Sent', `Your code is: ${code}`);
+  const handleParentLogin = () => {
+    setSelectedOption('parent');
+    setIsButtonEnabled(true);
   };
 
-  const verifyCode = () => {
-    if (verificationCode === sentCode) {
-      Alert.alert('Login Successful', 'Welcome to the Parent Dashboard!');
-      navigation.navigate('ParentDashboard');
-    } else {
-      Alert.alert('Invalid Code', 'Please enter the correct verification code.');
+  const handleNextPress = () => {
+    if (selectedOption === 'daughter') {
+      navigation.navigate('DaughterLoginScreen');
+    } else if (selectedOption === 'parent') {
+      navigation.navigate('ParentLoginScreen');
     }
   };
 
   return (
-    <ImageBackground source={require('../../assets/images/image.png')} style={styles.background} resizeMode="repeat">
-      <View style={styles.overlay}>
-        <Text style={styles.title}>Parent Login</Text>
+    <LinearGradient colors={['#B3E5FC', '#FFCDD2']} style={styles.container}>
+      <Text style={styles.title}>Choose Your Login Type</Text>
 
-        <TextInput
-          style={[styles.input, errors.name && styles.inputError]}
-          placeholder="Enter your name"
-          value={name}
-          onChangeText={setName}
-        />
-        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
-
-        <View style={[styles.pickerContainer, errors.relation && styles.inputError]}>
-          <Picker selectedValue={relation} onValueChange={(itemValue) => setRelation(itemValue)}>
-            <Picker.Item label="Select Relation" value="" />
-            <Picker.Item label="Father" value="Father" />
-            <Picker.Item label="Mother" value="Mother" />
-            <Picker.Item label="Guardian" value="Guardian" />
-          </Picker>
-        </View>
-        {errors.relation && <Text style={styles.errorText}>{errors.relation}</Text>}
-
-        <TextInput
-          style={[styles.input, errors.contactDetails && styles.inputError]}
-          placeholder="Enter phone number"
-          value={contactDetails}
-          onChangeText={setContactDetails}
-          keyboardType="phone-pad"
-        />
-        {errors.contactDetails && <Text style={styles.errorText}>{errors.contactDetails}</Text>}
-
-        <TextInput
-          style={[styles.input, errors.email && styles.inputError]}
-          placeholder="Enter email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-
-        <TouchableOpacity style={styles.button} onPress={sendVerificationCode}>
-          <Text style={styles.buttonText}>Send Verification Code</Text>
+      <View style={styles.optionContainer}>
+        <TouchableOpacity
+          style={[styles.optionBox, selectedOption === 'daughter' && styles.selectedBox]}
+          onPress={handleDaughterLogin}
+        >
+          <LottieView
+            source={require('../../assets/LottieJason/daughter-login.json')}
+            autoPlay
+            loop
+            style={styles.animation}
+          />
+          <Text style={[styles.optionText, selectedOption === 'daughter' && styles.selectedText]}>
+            Login as Child
+          </Text>
         </TouchableOpacity>
 
-        {isCodeSent && (
-          <>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter verification code"
-              value={verificationCode}
-              onChangeText={setVerificationCode}
-              keyboardType="numeric"
-            />
-            <TouchableOpacity style={styles.button} onPress={verifyCode}>
-              <Text style={styles.buttonText}>Verify & Login</Text>
-            </TouchableOpacity>
-          </>
-        )}
+        <TouchableOpacity
+          style={[styles.optionBox, selectedOption === 'parent' && styles.selectedBox]}
+          onPress={handleParentLogin}
+        >
+          <LottieView
+            source={require('../../assets/LottieJason/parent-login.json')}
+            autoPlay
+            loop
+            style={styles.animation}
+          />
+          <Text style={[styles.optionText, selectedOption === 'parent' && styles.selectedText]}>
+            Login as Parent
+          </Text>
+        </TouchableOpacity>
       </View>
-    </ImageBackground>
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: isButtonEnabled ? '#4CAF50' : '#9E9E9E' }]}
+        disabled={!isButtonEnabled}
+        onPress={handleNextPress}
+      >
+        <Text style={styles.buttonText}>Next</Text>
+      </TouchableOpacity>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  background: {
+  container: {
     flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Optional: White overlay for better readability
-    padding: 20,
     justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#0D47A1',
+    color: '#333',
+    marginBottom: 30,
   },
-  input: {
-    height: 50,
-    borderColor: '#90CAF9',
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 10,
+  optionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginBottom: 40, // More space above the button
+  },
+  optionBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: width * 0.4,
+    height: width * 0.5,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+    marginHorizontal: 10,
+  },
+  selectedBox: {
+    borderWidth: 3,
+    borderColor: '#4CAF50',
+  },
+  optionText: {
+    fontSize: 19,
     marginTop: 10,
-    paddingLeft: 10,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
-    color: '#000000',
+    textAlign: 'center',
+    color: '#555',
   },
-  inputError: {
-    borderColor: '#D32F2F',
-  },
-  errorText: {
-    color: '#D32F2F',
-    fontSize: 14,
-    marginBottom: 8,
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#90CAF9',
-    borderRadius: 8,
-    marginBottom: 10,
-    backgroundColor: '#FFFFFF',
+  selectedText: {
+    color: '#4CAF50',
   },
   button: {
-    backgroundColor: '#0D47A1',
-    padding: 15,
+    padding: 14,
     borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    width: '90%',
+    position: 'absolute',
+    bottom: height * 0.08, // Lowering the button
   },
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 20,
+    color: '#FFF',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  animation: {
+    width: width * 0.3,
+    height: width * 0.3,
+    backgroundColor: 'transparent',
   },
 });
 
-export default ParentLogin;
+export default LoginSelectionScreen;
