@@ -1,11 +1,10 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import AppIntroSlider from '../Screens/AppIntroSlider'; // Import your AppIntroSlider
-import LoginSelectionScreen from '../Screens/LoginSelection'; // Import the LoginSelectionScreen
-import DaughterLogin from '../Screens/DaughterLogin'; // Uncomment when DaughterLoginScreen is ready
+import AppIntroSlider from '../Screens/AppIntroSlider';
+import LoginSelectionScreen from '../Screens/LoginSelectionScreen';
+import DaughterLogin from '../Screens/DaughterLogin';
 import ParentLogin from '../Screens/ParentLogin';
-//import Dashboard from '../Screens/Dashboard'; // Replace with your Dashboard component
 
 const Stack = createStackNavigator();
 
@@ -16,29 +15,23 @@ const AppNavigator = () => {
         <Stack.Screen
           name="AppIntro"
           component={AppIntroSlider}
-          options={{ headerShown: false }} // Hide header for AppIntroSlider
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="LoginSelectionScreen"
           component={LoginSelectionScreen}
-          options={{ headerShown: false }} // Hide header for LoginSelectionScreen
+          options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="DaughterLoginScreen"
+          name="DaughterLogin"
           component={DaughterLogin}
-          options={{ headerShown: false }} // Hide header for LoginSelectionScreen
+          options={{ headerShown: false }}
         />
-        {/* <Stack.Screen
-          name="ParentLoginScreen"
+        <Stack.Screen
+          name="ParentLogin"
           component={ParentLogin}
-          options={{ headerShown: false }} // Hide header for LoginSelectionScreen
-        /> */}
-    
-        {/* <Stack.Screen
-          name="Dashboard"
-          component={Dashboard}
-          options={{ headerShown: false }} // Hide header for Dashboard
-        /> */}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

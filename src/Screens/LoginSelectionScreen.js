@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Dimensions, Text } from 'react-native';
 import LottieView from 'lottie-react-native';
 
 const { width } = Dimensions.get('window');
@@ -8,21 +8,16 @@ const LoginSelectionScreen = ({ navigation }) => {
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
 
-  const handleDaughterLogin = () => {
-    setSelectedOption('daughter');
-    setIsButtonEnabled(true);
-  };
-
-  const handleParentLogin = () => {
-    setSelectedOption('parent');
+  const handleLoginSelection = (type) => {
+    setSelectedOption(type);
     setIsButtonEnabled(true);
   };
 
   const handleNextPress = () => {
     if (selectedOption === 'daughter') {
-      navigation.navigate('DaughterLoginScreen');
+      navigation.navigate('DaughterLogin'); //  Ensure this name matches AppNavigator
     } else if (selectedOption === 'parent') {
-      navigation.navigate('ParentLoginScreen');
+      navigation.navigate('ParentLogin'); // Ensure this name matches AppNavigator
     }
   };
 
@@ -33,7 +28,7 @@ const LoginSelectionScreen = ({ navigation }) => {
       <View style={styles.optionContainer}>
         <TouchableOpacity
           style={[styles.optionBox, selectedOption === 'daughter' && styles.selectedBox]}
-          onPress={handleDaughterLogin}
+          onPress={() => handleLoginSelection('daughter')}
         >
           <LottieView
             source={require('../../assets/LottieJason/daughter-login.json')}
@@ -48,7 +43,7 @@ const LoginSelectionScreen = ({ navigation }) => {
 
         <TouchableOpacity
           style={[styles.optionBox, selectedOption === 'parent' && styles.selectedBox]}
-          onPress={handleParentLogin}
+          onPress={() => handleLoginSelection('parent')}
         >
           <LottieView
             source={require('../../assets/LottieJason/parent-login.json')}
@@ -78,7 +73,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     backgroundColor: '#f0f4f7',
   },
   title: {
@@ -89,24 +84,24 @@ const styles = StyleSheet.create({
   },
   optionContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     width: '100%',
+    paddingHorizontal: 10,
     marginBottom: 30,
   },
   optionBox: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: width * 0.4,
+    width: width * 0.42,
     height: width * 0.5,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
-    marginHorizontal: 10,
   },
   selectedBox: {
     borderWidth: 3,
@@ -120,6 +115,7 @@ const styles = StyleSheet.create({
   },
   selectedText: {
     color: '#4CAF50',
+    fontWeight: 'bold',
   },
   button: {
     padding: 12,

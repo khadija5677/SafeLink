@@ -1,282 +1,191 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-//import { launchImageLibrary } from 'react-native-image-picker';
+import React, { useState, useEffect } from 'react';
+import { 
+  View, Text, TextInput, TouchableOpacity, StyleSheet, 
+  Dimensions, Alert, Image, ScrollView, Modal
+} from 'react-native';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const DaughterLogin = ({ navigation }) => {
   const [name, setName] = useState('');
   const [fatherName, setFatherName] = useState('');
-  const [brotherName, setBrotherName] = useState('');
   const [address, setAddress] = useState('');
   const [email, setEmail] = useState('');
-  const [age, setAge] = useState('');
   const [bloodGroup, setBloodGroup] = useState('');
+  const [age, setAge] = useState('');
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const [photo, setPhoto] = useState(null);
-  const [emergencyContacts, setEmergencyContacts] = useState([{ number: '' }]);
+  const [emergencyContacts, setEmergencyContacts] = useState([{ id: 1, number: '' }]);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  
+  useEffect(() => {
+    const isAllFieldsFilled =
+      name.trim() !== '' &&
+      fatherName.trim() !== '' &&
+      address.trim() !== '' &&
+      email.trim() !== '' &&
+      bloodGroup.trim() !== '' &&
+      photo !== null &&
+      emergencyContacts.every(contact => contact.number.trim() !== '');
 
-  // Handle input changes to enable or disable the Submit button
-  const handleInputChange = () => {
-    if (
-      name &&
-      fatherName &&
-      brotherName &&
-      address &&
-      email &&
-      age &&
-      bloodGroup &&
-      height &&
-      weight &&
-      photo &&
-      emergencyContacts.every(contact => contact.number)
-    ) {
-      setIsButtonEnabled(true);
+    setIsButtonEnabled(isAllFieldsFilled);
+  }, [name, fatherName, address, email, bloodGroup, photo, emergencyContacts]);
+
+  const handlePhotoSelection = () => {
+    if (photo) {
+      setModalVisible(true);
     } else {
-      setIsButtonEnabled(false);
+      Alert.alert(
+        'Choose an Option',
+        'Select an option to upload a photo',
+        [
+          { text: 'Upload from Media', onPress: handlePhotoUpload },
+          { text: 'Capture Photo', onPress: handleCapturePhoto },
+          { text: 'Cancel', style: 'cancel' },
+        ]
+      );
     }
   };
 
-  // Check if the email is valid
-  const isValidEmail = (email) => {
-    const regex = /\S+@\S+\.\S+/;
-    return regex.test(email);
-  };
-
-  // Handle form submission
-  const handleSubmit = () => {
-    if (isButtonEnabled) {
-      if (!isValidEmail(email)) {
-        Alert.alert('Invalid Email', 'Please enter a valid email address.');
-        return;
-      }
-      Alert.alert('Profile Updated', 'Your profile has been successfully updated!');
-      navigation.navigate('Dashboard');
-    } else {
-      Alert.alert('Error', 'Please fill in all fields.');
-    }
-  };
-
-  // Function to launch image picker
   const handlePhotoUpload = () => {
     launchImageLibrary({ mediaType: 'photo', quality: 0.5 }, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.errorCode) {
-        console.error('ImagePicker Error: ', response.errorMessage);
-      } else {
-        setPhoto(response.assets[0].uri); // Set the selected photo's URI
-        handleInputChange(); // Re-check if the form is filled
+      if (!response.didCancel && !response.error) {
+        setPhoto(response.assets[0].uri);
+        setModalVisible(false);
       }
     });
   };
 
-  // Add a new emergency contact field
-  const addEmergencyContact = () => {
-    setEmergencyContacts([...emergencyContacts, { number: '' }]);
+  const handleCapturePhoto = () => {
+    launchCamera({ mediaType: 'photo', quality: 0.5 }, (response) => {
+      if (!response.didCancel && !response.error) {
+        setPhoto(response.assets[0].uri);
+        setModalVisible(false);
+      }
+    });
   };
 
-  // Remove an emergency contact field
-  const removeEmergencyContact = (index) => {
-    const updatedContacts = emergencyContacts.filter((_, i) => i !== index);
+  const handleRemovePhoto = () => {
+    setPhoto(null);
+    setModalVisible(false);
+  };
+
+  const handleAddEmergencyContact = () => {
+    const newContact = { id: emergencyContacts.length + 1, number: '' };
+    setEmergencyContacts([...emergencyContacts, newContact]);
+  };
+
+  const handleRemoveEmergencyContact = (id) => {
+    const updatedContacts = emergencyContacts.filter(contact => contact.id !== id);
+    setEmergencyContacts(updatedContacts);
+  };
+
+  const handleEmergencyContactChange = (id, number) => {
+    const updatedContacts = emergencyContacts.map(contact => 
+      contact.id === id ? { ...contact, number } : contact
+    );
     setEmergencyContacts(updatedContacts);
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Profile Information</Text>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.title}>Daughter Login</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={(text) => { setName(text); handleInputChange(); }}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Father's Name"
-        value={fatherName}
-        onChangeText={(text) => { setFatherName(text); handleInputChange(); }}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Brother's Name"
-        value={brotherName}
-        onChangeText={(text) => { setBrotherName(text); handleInputChange(); }}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Address"
-        value={address}
-        onChangeText={(text) => { setAddress(text); handleInputChange(); }}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={(text) => { setEmail(text); handleInputChange(); }}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Age"
-        value={age}
-        onChangeText={(text) => { setAge(text); handleInputChange(); }}
-        keyboardType="numeric"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Blood Group"
-        value={bloodGroup}
-        onChangeText={(text) => { setBloodGroup(text); handleInputChange(); }}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Height (in cm)"
-        value={height}
-        onChangeText={(text) => { setHeight(text); handleInputChange(); }}
-        keyboardType="numeric"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Weight (in kg)"
-        value={weight}
-        onChangeText={(text) => { setWeight(text); handleInputChange(); }}
-        keyboardType="numeric"
-      />
-
-      {/* Emergency Contacts */}
-      {emergencyContacts.map((contact, index) => (
-        <View key={index} style={styles.emergencyContactContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder={`Emergency Contact ${index + 1}`}
-            value={contact.number}
-            onChangeText={(text) => {
-              const updatedContacts = [...emergencyContacts];
-              updatedContacts[index].number = text;
-              setEmergencyContacts(updatedContacts);
-              handleInputChange();
-            }}
-            keyboardType="phone-pad"
+        <TouchableOpacity onPress={handlePhotoSelection}>
+          <Image 
+            source={photo ? { uri: photo } : require('../../assets/images/default-profile.png')} 
+            style={styles.roundImage} 
+            resizeMode="cover"
           />
-          {index > 1 && (
-            <TouchableOpacity onPress={() => removeEmergencyContact(index)} style={styles.removeButton}>
-              <Text style={styles.removeButtonText}>Remove</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      ))}
-      <TouchableOpacity onPress={addEmergencyContact} style={styles.addButton}>
-        <Text style={styles.addButtonText}>Add Emergency Contact</Text>
-      </TouchableOpacity>
+        </TouchableOpacity>
 
-      {/* Upload Photo Button */}
-      <TouchableOpacity onPress={handlePhotoUpload} style={styles.photoButton}>
-        <Text style={styles.photoButtonText}>Upload Photo</Text>
-      </TouchableOpacity>
+        <Modal visible={modalVisible} transparent animationType="fade">
+          <View style={styles.modalContainer}>
+            {photo && (
+              <Image source={{ uri: photo }} style={styles.fullImage} resizeMode="cover" />
+            )}
+            <View style={styles.optionCircles}>
+              <TouchableOpacity onPress={handlePhotoUpload} style={styles.optionCircle}><Text style={styles.optionText}>📁</Text></TouchableOpacity>
+              <TouchableOpacity onPress={handleCapturePhoto} style={styles.optionCircle}><Text style={styles.optionText}>📷</Text></TouchableOpacity>
+              {photo && <TouchableOpacity onPress={handleRemovePhoto} style={styles.optionCircle}><Text style={styles.optionText}>🗑️</Text></TouchableOpacity>}
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.optionCircle}><Text style={styles.optionText}>❌</Text></TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
-      {/* Display the selected photo */}
-      {photo && <Image source={{ uri: photo }} style={styles.image} />}
+        <TextInput style={styles.input} placeholder="Name *" value={name} onChangeText={setName} />
+        <TextInput style={styles.input} placeholder="Father's Name *" value={fatherName} onChangeText={setFatherName} />
+        <TextInput style={styles.input} placeholder="Address *" value={address} onChangeText={setAddress} />
+        <TextInput style={styles.input} placeholder="Email *" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+        <TextInput style={styles.input} placeholder="Blood Group *" value={bloodGroup} onChangeText={setBloodGroup} />
+        <TextInput style={styles.input} placeholder="Age" value={age} onChangeText={setAge} keyboardType="numeric" />
+        <TextInput style={styles.input} placeholder="Height (in cm)" value={height} onChangeText={setHeight} keyboardType="numeric" />
+        <TextInput style={styles.input} placeholder="Weight (in kg)" value={weight} onChangeText={setWeight} keyboardType="numeric" />
 
-    
-      <TouchableOpacity
-        style={[styles.submitButton, { backgroundColor: isButtonEnabled ? '#4CAF50' : '#D3D3D3' }]}
-        onPress={handleSubmit}
-        disabled={!isButtonEnabled}
-      >
-        <Text style={styles.submitButtonText}>Submit</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        {emergencyContacts.map((contact, index) => (
+          <View key={contact.id} style={styles.emergencyContactContainer}>
+            <TextInput
+              style={[styles.input, { flex: 1 }]}
+              placeholder={`Emergency Contact ${index + 1} *`}
+              value={contact.number}
+              onChangeText={(text) => handleEmergencyContactChange(contact.id, text)}
+              keyboardType="phone-pad"
+            />
+            {emergencyContacts.length > 1 && (
+              <TouchableOpacity onPress={() => handleRemoveEmergencyContact(contact.id)} style={styles.removeContactButton}>
+                <Text style={styles.removeContactButtonText}>🗑️</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        ))}
+
+        <TouchableOpacity onPress={handleAddEmergencyContact} style={styles.addContactButton}>
+          <Text style={styles.addContactButtonText}>Add Emergency Contact</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.submitButton, { opacity: isButtonEnabled ? 1 : 0.6 }]} 
+          onPress={() => Alert.alert('Profile Updated')} 
+          disabled={!isButtonEnabled}
+        >
+          <Text style={styles.submitButtonText}>Submit</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-      padding: 20,
-      backgroundColor: '#FFFFFF',
-    },
-    title: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: '#000000',
-      textAlign: 'center',
-      marginBottom: 20,
-    },
-    input: {
-      height: 50,
-      borderColor: '#CCCCCC',
-      borderWidth: 1,
-      borderRadius: 5,
-      marginBottom: 15,
-      paddingLeft: 10,
-      fontSize: 16,
-      color: '#000000',
-    },
-    photoButton: {
-      backgroundColor: '#4CAF50',
-      padding: 10,
-      borderRadius: 5,
-      marginBottom: 15,
-      alignItems: 'center',
-    },
-    photoButtonText: {
-      color: '#FFFFFF',
-      fontSize: 16,
-    },
-    image: {
-      width: width - 200,
-      height: width - 200, // Ensure the height equals the width to maintain a circle
-      borderRadius: (width - 40) / 2, // Half of the width to make it circular
-      marginBottom: 15,
-      alignSelf: 'center',
-    },
-    submitButton: {
-      padding: 15,
-      borderRadius: 5,
-      alignItems: 'center',
-    },
-    submitButtonText: {
-      color: 'gray',
-      fontSize: 18,
-      fontWeight: 'bold',
-    },
-    emergencyContactContainer: {
-      marginBottom: 15,
-    },
-    addButton: {
-      backgroundColor: '#2196F3',
-      padding: 10,
-      borderRadius: 5,
-      marginBottom: 15,
-      alignItems: 'center',
-    },
-    addButtonText: {
-      color: '#FFFFFF',
-      fontSize: 16,
-    },
-    removeButton: {
-      backgroundColor: '#FF6347',
-      padding: 5,
-      borderRadius: 5,
-      marginTop: 5,
-      alignItems: 'center',
-    },
-    removeButtonText: {
-      color: '#FFFFFF',
-      fontSize: 14,
-    },
-  });
-  
+  container: { flex: 1, backgroundColor: '#E6E6FA', padding: 20 },
+  title: { fontSize: 24, fontWeight: 'bold', color: '#6A5ACD', textAlign: 'center', marginBottom: 20 },
+  roundImage: { width: 120, height: 120, borderRadius: 100, marginBottom: 20, alignSelf: 'center', borderColor: '#BA55D3', borderWidth: 2 },
+  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.8)' },
+  fullImage: { width: width * 0.8, height: width * 0.8, borderRadius: width * 0.4 },
+  optionCircles: { flexDirection: 'row', position: 'absolute', bottom: 20 },
+  optionCircle: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#BA55D3', justifyContent: 'center', alignItems: 'center', marginHorizontal: 10 },
+  optionText: { color: '#FFF', fontSize: 24 },
+  input: { 
+    width: '100%', 
+    height: 50, 
+    backgroundColor: '#F8F0FF', // Light lavender background (neutral)
+    borderRadius: 12, 
+    paddingHorizontal: 15, 
+    fontSize: 16, 
+    marginBottom: 15, 
+    borderColor: '#6A5ACD', // Lilac border
+    borderWidth: 1 
+  },
+  emergencyContactContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
+  removeContactButton: { marginLeft: 10, padding: 10, backgroundColor: '#FF6347', borderRadius: 12 },
+  removeContactButtonText: { color: '#FFF', fontSize: 18 },
+  addContactButton: { width: '100%', padding: 15, borderRadius: 12, alignItems: 'center', backgroundColor: '#9370DB', marginBottom: 15 }, // Lilac button
+  addContactButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
+  submitButton: { width: '100%', padding: 15, borderRadius: 12, alignItems: 'center', backgroundColor: '#6A5ACD' }, // Lilac submit button
+  submitButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold' }
+});
+
 export default DaughterLogin;

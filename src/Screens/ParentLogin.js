@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-//import { Picker } from '@react-native-picker/picker';  // Correct import
+import { Picker } from '@react-native-picker/picker';  // Correct import
 
 const ParentLogin = ({ navigation }) => {
   const [name, setName] = useState('');

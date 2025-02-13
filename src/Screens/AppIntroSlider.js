@@ -1,77 +1,81 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Alert } from 'react-native';
 import AppIntroSlider from 'react-native-app-intro-slider';
 import LottieView from 'lottie-react-native';
+import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 const { width } = Dimensions.get('window');
 
-// Example slides data
 const slides = [
   {
     key: '1',
     title: 'Stay Connected',
     text: 'Share your location with trusted contacts in real-time.',
-    animation: require('../../assets/LottieJason/location-sharing.json'), // Ensure this file exists
+    animation: require('../../assets/LottieJason/location-sharing.json'),
     backgroundColor: '#283593',
   },
   {
     key: '2',
     title: 'Watch Assistant',
     text: 'Control and monitor your safety features directly from your smartwatch.',
-    animation: require('../../assets/LottieJason/watch-assistant.json'), // Ensure this file exists
+    animation: require('../../assets/LottieJason/watch-assistant.json'),
     backgroundColor: '#FF4081',
   },
   {
     key: '3',
     title: 'Emergency Assistance',
     text: 'Quickly alert authorities and family during emergencies.',
-    animation: require('../../assets/LottieJason/SOS.json'), // Ensure this file exists
+    animation: require('../../assets/LottieJason/SOS.json'),
     backgroundColor: '#00E5FF',
   },
 ];
 
 const AppIntro = ({ navigation }) => {
-  // Render each slide
-  const renderSlide = ({ item }) => {
-    return (
-      <View style={[styles.slide, {backgroundColor: item.backgroundColor }]}>
-        {item.animation && (
-          <LottieView
-            source={item.animation}
-            autoPlay
-            loop
-            style={styles.animation}
-          />
-        )}
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.text}>{item.text}</Text>
-      </View>
-    );
+  const requestPermissions = async () => {
+    try {
+      // Request Location Permission (Foreground Only)
+      const locationPermission = await request(
+        PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
+      );
+
+      if (locationPermission !== RESULTS.GRANTED) {
+        Alert.alert("Location Permission Required", "Please enable location to continue.");
+      }
+
+      // Request Notification Permission
+      if (PERMISSIONS.ANDROID.POST_NOTIFICATIONS) {
+        const notificationPermission = await request(PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
+        if (notificationPermission !== RESULTS.GRANTED) {
+          Alert.alert("Notification Permission Required", "Please enable notifications.");
+        }
+      }
+
+      // Request Camera Permission
+      const cameraPermission = await request(PERMISSIONS.ANDROID.CAMERA);
+      if (cameraPermission !== RESULTS.GRANTED) {
+        Alert.alert("Camera Permission Required", "Please enable camera access.");
+      }
+
+      // Navigate to Login Screen after permissions
+      navigation.replace('LoginSelectionScreen');
+
+    } catch (error) {
+      console.error("Permission Error:", error);
+      navigation.replace('LoginSelectionScreen'); // Navigate even if an error occurs
+    }
   };
 
-  // Handle Done button press
   const onDone = () => {
-    navigation.navigate('LoginSelectionScreen'); // Navigate to the LoginSelection screen after the slider
+    requestPermissions(); // Request permissions after the last slide
   };
 
-  // Custom render for Next button
-  const renderNextButton = () => (
-    <View style={styles.button}>
-      <Text style={styles.buttonText}>Next</Text>
-    </View>
-  );
-
-  // Custom render for Done button
-  const renderDoneButton = () => (
-    <View style={styles.button}>
-      <Text style={styles.buttonText}>Done</Text>
-    </View>
-  );
-
-  // Custom render for Skip button
-  const renderSkipButton = () => (
-    <View style={styles.button}>
-      <Text style={styles.buttonText}>Skip</Text>
+  const renderSlide = ({ item }) => (
+    <View style={[styles.slide, { backgroundColor: item.backgroundColor }]}>
+      {item.animation && (
+        <LottieView source={item.animation} autoPlay loop style={styles.animation} />
+      )}
+      <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.text}>{item.text}</Text>
     </View>
   );
 
@@ -81,10 +85,10 @@ const AppIntro = ({ navigation }) => {
       data={slides}
       onDone={onDone}
       showSkipButton
-      onSkip={onDone} // If skip is pressed, go directly to LoginSelection
-      renderNextButton={renderNextButton}
-      renderDoneButton={renderDoneButton}
-      renderSkipButton={renderSkipButton}
+      onSkip={onDone}
+      renderNextButton={() => <View style={styles.button}><Text style={styles.buttonText}>Next</Text></View>}
+      renderDoneButton={() => <View style={styles.button}><Text style={styles.buttonText}>Done</Text></View>}
+      renderSkipButton={() => <View style={styles.button}><Text style={styles.buttonText}>Skip</Text></View>}
       dotStyle={styles.dot}
       activeDotStyle={styles.activeDot}
     />
@@ -101,18 +105,18 @@ const styles = StyleSheet.create({
   animation: {
     width: width * 0.8,
     height: width * 0.8,
-    backgroundColor: 'transparent', // Ensure background is transparent
+    backgroundColor: 'transparent',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFF', // Ensure text color contrasts with the background
+    color: '#FFF',
     marginTop: 20,
     textAlign: 'center',
   },
   text: {
     fontSize: 18,
-    color: '#FFF', // Ensure text color contrasts with the background
+    color: '#FFF',
     textAlign: 'center',
     marginTop: 10,
     paddingHorizontal: 20,

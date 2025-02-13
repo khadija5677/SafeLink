@@ -4,5 +4,8 @@
 
     <!-- App Name -->
     <string name="app_name">SafeLink</string>
+    <string name="location_permission_explanation">
+    This app collects location data to enable safety features even when the app is closed.
+    </string>
 </resources>
 
