@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Dimensions, Text } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import LottieView from 'lottie-react-native';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const LoginSelectionScreen = ({ navigation }) => {
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
@@ -15,14 +16,14 @@ const LoginSelectionScreen = ({ navigation }) => {
 
   const handleNextPress = () => {
     if (selectedOption === 'daughter') {
-      navigation.navigate('DaughterLogin'); //  Ensure this name matches AppNavigator
+      navigation.navigate('DaughterLogin');
     } else if (selectedOption === 'parent') {
-      navigation.navigate('ParentLogin'); // Ensure this name matches AppNavigator
+      navigation.navigate('ParentLogin');
     }
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={['#B3E5FC', '#FFCDD2']} style={styles.container}>
       <Text style={styles.title}>Choose Your Login Type</Text>
 
       <View style={styles.optionContainer}>
@@ -64,7 +65,7 @@ const LoginSelectionScreen = ({ navigation }) => {
       >
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -73,8 +74,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    backgroundColor: '#f0f4f7',
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 26,
@@ -86,8 +86,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    paddingHorizontal: 10,
-    marginBottom: 30,
+    marginBottom: 40,
   },
   optionBox: {
     alignItems: 'center',
@@ -96,7 +95,7 @@ const styles = StyleSheet.create({
     height: width * 0.5,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 15,
+    padding: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -118,10 +117,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   button: {
-    padding: 12,
+    padding: 14,
     borderRadius: 8,
-    marginTop: 30,
-    width: '95%',
+    width: '90%',
+    position: 'absolute',
+    bottom: height * 0.08,
   },
   buttonText: {
     fontSize: 20,

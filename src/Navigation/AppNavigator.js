@@ -5,6 +5,8 @@ import AppIntroSlider from '../Screens/AppIntroSlider';
 import LoginSelectionScreen from '../Screens/LoginSelectionScreen';
 import DaughterLogin from '../Screens/DaughterLogin';
 import ParentLogin from '../Screens/ParentLogin';
+import PDashboard from '../Screens/ParentDashboard';
+import TrustedContacts from '../Screens/TrustedContacts';
 
 const Stack = createStackNavigator();
 
@@ -30,6 +32,16 @@ const AppNavigator = () => {
         <Stack.Screen
           name="ParentLogin"
           component={ParentLogin}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ParentDashboard"
+          component={PDashboard}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="TContacts"
+          component={TrustedContacts}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
