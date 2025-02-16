@@ -7,6 +7,7 @@ import DaughterLogin from '../Screens/DaughterLogin'; // Uncomment when Daughter
 import ParentLogin from '../Screens/ParentLogin';
 import PDashboard from '../Screens/ParentDashboard'; // Replace with your Dashboard component
 import TrustedContacts from '../Screens/TrustedContacts';
+import Dashboard from '../Screens/Dashboard';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -42,6 +43,12 @@ const AppNavigator = () => {
         <Stack.Screen
           name="TContacts"
           component={TrustedContacts}
+          options={{ headerShown: false }} // Hide header for Dashboard
+        />
+
+        <Stack.Screen
+          name="CDashboard"
+          component={Dashboard}
           options={{ headerShown: false }} // Hide header for Dashboard
         />
       </Stack.Navigator>

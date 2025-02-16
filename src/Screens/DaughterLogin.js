@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-//import { launchImageLibrary } from 'react-native-image-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 const { width } = Dimensions.get('window');
 
@@ -53,7 +53,7 @@ const DaughterLogin = ({ navigation }) => {
         return;
       }
       Alert.alert('Profile Updated', 'Your profile has been successfully updated!');
-      navigation.navigate('Dashboard');
+      navigation.navigate('CDashboard');
     } else {
       Alert.alert('Error', 'Please fill in all fields.');
     }
