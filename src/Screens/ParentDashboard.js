@@ -4,8 +4,8 @@ import MapView, { Marker } from 'react-native-maps';
 
 const ParentDashboard = ({ navigation }) => {
   const [childLocation, setChildLocation] = useState({
-    latitude: 37.7749,
-    longitude: -122.4194,
+      latitude: 28.6139,  // New Delhi Latitude
+      longitude: 77.2090, // New Delhi Longitude
   });
   const [childName, setChildName] = useState('Child');
   const [batteryStatus, setBatteryStatus] = useState(85);
@@ -15,6 +15,7 @@ const ParentDashboard = ({ navigation }) => {
     <View style={styles.container}>
       {/* Interactive Map */}
       <MapView
+        provider={MapView.PROVIDER_GOOGLE} // Use Google Maps
         style={styles.map}
         initialRegion={{
           latitude: childLocation.latitude,
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
   },
   topContent: {
     alignItems: 'center',
-    backgroundColor: 'rgba(5, 11, 20, 0.8)', // Semi-transparent blue
+    backgroundColor: 'rgba(0, 10, 23, 0.8)', // Semi-transparent blue
     padding: 15,
     marginHorizontal: 20,
     borderRadius: 10,
