@@ -10,6 +10,8 @@ import MapComponent from './Components/Map';
 import LocationTracker from './Components/LiveLocation';
 import AppNavigator from './Navigation/AppNavigator';
 import AppIntro from './Screens/AppIntroSlider';
+import DaughterDashboard from './Screens/DaughterDashboard';
+import DaughterLogin from './Screens/DaughterLogin';
 //import ResponsiveText from './Components/ResponsiveText'; // import ResponsiveText component
 
 const Main = () => {
@@ -36,7 +38,7 @@ const Main = () => {
           < AppIntro />
 
           {/* Uncomment below to include AppNavigator */}
-          {/* <AppNavigator /> */}
+          <AppNavigator />
         {/* </View> */}
 
         {/* Uncomment below if you want to include the footer */}

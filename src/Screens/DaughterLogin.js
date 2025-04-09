@@ -1,282 +1,186 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert, Image, ScrollView } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { TextInput, Button } from 'react-native-paper';
+import { ProfileContext } from '../context/ProfileContext';
 
 const { width } = Dimensions.get('window');
 
 const DaughterLogin = ({ navigation }) => {
-  const [name, setName] = useState('');
-  const [fatherName, setFatherName] = useState('');
-  const [brotherName, setBrotherName] = useState('');
-  const [address, setAddress] = useState('');
-  const [email, setEmail] = useState('');
-  const [age, setAge] = useState('');
-  const [bloodGroup, setBloodGroup] = useState('');
-  const [height, setHeight] = useState('');
-  const [weight, setWeight] = useState('');
-  const [photo, setPhoto] = useState(null);
-  const [emergencyContacts, setEmergencyContacts] = useState([{ number: '' }]);
+  const { setProfileData } = useContext(ProfileContext);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    fatherName: '',
+    address: '',
+    email: '',
+    bloodGroup: '',
+    yourContact: '',
+    age: '',
+    height: '',
+    weight: '',
+    photo: null,
+  });
+
+  const [emergencyContacts, setEmergencyContacts] = useState([
+    { id: 1, number: '' },
+    { id: 2, number: '' },
+  ]);
+
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
-  // Handle input changes to enable or disable the Submit button
-  const handleInputChange = () => {
-    if (
-      name &&
-      fatherName &&
-      brotherName &&
-      address &&
-      email &&
-      age &&
-      bloodGroup &&
-      height &&
-      weight &&
-      photo &&
-      emergencyContacts.every(contact => contact.number)
-    ) {
-      setIsButtonEnabled(true);
-    } else {
-      setIsButtonEnabled(false);
-    }
+  useEffect(() => {
+    const requiredFields = ['name', 'fatherName', 'address', 'email', 'bloodGroup', 'yourContact', 'photo'];
+    const areRequiredFieldsFilled = requiredFields.every(field => {
+      const value = formData[field];
+      return value && value.toString().trim() !== '';
+    });
+  
+    const areContactsFilled = emergencyContacts.every(contact => contact.number.trim() !== '');
+  
+    setIsButtonEnabled(areRequiredFieldsFilled && areContactsFilled);
+  }, [formData, emergencyContacts]);
+  
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Check if the email is valid
-  const isValidEmail = (email) => {
-    const regex = /\S+@\S+\.\S+/;
-    return regex.test(email);
+  const selectImage = () => {
+    Alert.alert('Select Profile Picture', 'Choose an option', [
+      { text: 'Capture Photo', onPress: openCamera },
+      { text: 'Upload from Gallery', onPress: openGallery },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
 
-  // Handle form submission
-  const handleSubmit = () => {
-    if (isButtonEnabled) {
-      if (!isValidEmail(email)) {
-        Alert.alert('Invalid Email', 'Please enter a valid email address.');
-        return;
-      }
-      Alert.alert('Profile Updated', 'Your profile has been successfully updated!');
-      navigation.navigate('CDashboard');
-    } else {
-      Alert.alert('Error', 'Please fill in all fields.');
-    }
-  };
-
-  // Function to launch image picker
-  const handlePhotoUpload = () => {
-    launchImageLibrary({ mediaType: 'photo', quality: 0.5 }, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.errorCode) {
-        console.error('ImagePicker Error: ', response.errorMessage);
-      } else {
-        setPhoto(response.assets[0].uri); // Set the selected photo's URI
-        handleInputChange(); // Re-check if the form is filled
-      }
+  const openCamera = () => {
+    launchCamera({ mediaType: 'photo', quality: 0.8 }, response => {
+      if (response.didCancel || !response.assets?.length) return;
+      handleInputChange('photo', response.assets[0].uri);
     });
   };
 
-  // Add a new emergency contact field
-  const addEmergencyContact = () => {
-    setEmergencyContacts([...emergencyContacts, { number: '' }]);
+  const openGallery = () => {
+    launchImageLibrary({ mediaType: 'photo', quality: 0.8 }, response => {
+      if (response.didCancel || !response.assets?.length) return;
+      handleInputChange('photo', response.assets[0].uri);
+    });
   };
 
-  // Remove an emergency contact field
-  const removeEmergencyContact = (index) => {
-    const updatedContacts = emergencyContacts.filter((_, i) => i !== index);
-    setEmergencyContacts(updatedContacts);
+  const addEmergencyContact = () => {
+    setEmergencyContacts([...emergencyContacts, { id: Date.now(), number: '' }]);
   };
+
+  const removeEmergencyContact = id => {
+    if (emergencyContacts.length > 2) {
+      setEmergencyContacts(emergencyContacts.filter(contact => contact.id !== id));
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!isButtonEnabled) {
+      Alert.alert('Error', 'Please fill in all required fields.');
+      return;
+    }
+  
+    // ✅ Basic Email Format Validation
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address.');
+      return;
+    }
+  
+    // Save to global context
+    setProfileData({ ...formData, emergencyContacts });
+  
+    Alert.alert('Success', 'Profile Updated Successfully!', [
+      {
+        text: 'OK',
+        onPress: () => navigation.replace('DaughterDashboard'),
+      },
+    ]);
+  };
+  
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Profile Information</Text>
+    <LinearGradient colors={['#E6E6FA', '#BA55D3']} style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.title}>Daughter Login</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={(text) => { setName(text); handleInputChange(); }}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Father's Name"
-        value={fatherName}
-        onChangeText={(text) => { setFatherName(text); handleInputChange(); }}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Brother's Name"
-        value={brotherName}
-        onChangeText={(text) => { setBrotherName(text); handleInputChange(); }}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Address"
-        value={address}
-        onChangeText={(text) => { setAddress(text); handleInputChange(); }}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={(text) => { setEmail(text); handleInputChange(); }}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Age"
-        value={age}
-        onChangeText={(text) => { setAge(text); handleInputChange(); }}
-        keyboardType="numeric"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Blood Group"
-        value={bloodGroup}
-        onChangeText={(text) => { setBloodGroup(text); handleInputChange(); }}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Height (in cm)"
-        value={height}
-        onChangeText={(text) => { setHeight(text); handleInputChange(); }}
-        keyboardType="numeric"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Weight (in kg)"
-        value={weight}
-        onChangeText={(text) => { setWeight(text); handleInputChange(); }}
-        keyboardType="numeric"
-      />
-
-      {/* Emergency Contacts */}
-      {emergencyContacts.map((contact, index) => (
-        <View key={index} style={styles.emergencyContactContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder={`Emergency Contact ${index + 1}`}
-            value={contact.number}
-            onChangeText={(text) => {
-              const updatedContacts = [...emergencyContacts];
-              updatedContacts[index].number = text;
-              setEmergencyContacts(updatedContacts);
-              handleInputChange();
-            }}
-            keyboardType="phone-pad"
+        <TouchableOpacity onPress={selectImage}>
+          <Image
+            source={
+              formData.photo
+                ? { uri: formData.photo }
+                : require('../../assets/images/image.png')
+            }
+            style={styles.roundImage}
+            resizeMode="cover"
           />
-          {index > 1 && (
-            <TouchableOpacity onPress={() => removeEmergencyContact(index)} style={styles.removeButton}>
-              <Text style={styles.removeButtonText}>Remove</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      ))}
-      <TouchableOpacity onPress={addEmergencyContact} style={styles.addButton}>
-        <Text style={styles.addButtonText}>Add Emergency Contact</Text>
-      </TouchableOpacity>
+        </TouchableOpacity>
 
-      {/* Upload Photo Button */}
-      <TouchableOpacity onPress={handlePhotoUpload} style={styles.photoButton}>
-        <Text style={styles.photoButtonText}>Upload Photo</Text>
-      </TouchableOpacity>
+        <TextInput label="Name *" value={formData.name} onChangeText={text => handleInputChange('name', text)} style={styles.input} />
+        <TextInput label="Father's Name *" value={formData.fatherName} onChangeText={text => handleInputChange('fatherName', text)} style={styles.input} />
+        <TextInput label="Address *" value={formData.address} onChangeText={text => handleInputChange('address', text)} style={styles.input} />
+        <TextInput label="Email *" value={formData.email} onChangeText={text => handleInputChange('email', text)} keyboardType="email-address" autoCapitalize="none" style={styles.input} />
+        <TextInput label="Blood Group *" value={formData.bloodGroup} onChangeText={text => handleInputChange('bloodGroup', text)} style={styles.input} />
+        <TextInput label="Your Contact *" value={formData.yourContact} onChangeText={text => handleInputChange('yourContact', text)} keyboardType="phone-pad" style={styles.input} />
+        <TextInput label="Age" value={formData.age} onChangeText={text => handleInputChange('age', text)} keyboardType="numeric" style={styles.input} />
+        <TextInput label="Height (in cm)" value={formData.height} onChangeText={text => handleInputChange('height', text)} keyboardType="numeric" style={styles.input} />
+        <TextInput label="Weight (in kg)" value={formData.weight} onChangeText={text => handleInputChange('weight', text)} keyboardType="numeric" style={styles.input} />
 
-      {/* Display the selected photo */}
-      {photo && <Image source={{ uri: photo }} style={styles.image} />}
+        {emergencyContacts.map((contact, index) => (
+          <View key={contact.id} style={styles.contactContainer}>
+            <TextInput
+              label={`Emergency Contact ${index + 1} *`}
+              value={contact.number}
+              onChangeText={text => {
+                const updated = [...emergencyContacts];
+                updated[index].number = text;
+                setEmergencyContacts(updated);
+              }}
+              keyboardType="phone-pad"
+              style={styles.input}
+            />
+            {index >= 2 && (
+              <TouchableOpacity onPress={() => removeEmergencyContact(contact.id)}>
+                <Text style={styles.removeButton}>Remove</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        ))}
 
-    
-      <TouchableOpacity
-        style={[styles.submitButton, { backgroundColor: isButtonEnabled ? '#4CAF50' : '#D3D3D3' }]}
-        onPress={handleSubmit}
-        disabled={!isButtonEnabled}
-      >
-        <Text style={styles.submitButtonText}>Submit</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <Button mode="contained" onPress={addEmergencyContact} style={styles.addButton}>
+          Add Contact
+        </Button>
+
+        <Button mode="contained" onPress={handleSubmit} disabled={!isButtonEnabled} style={styles.submitButton}>
+          Submit
+        </Button>
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-      padding: 20,
-      backgroundColor: '#FFFFFF',
-    },
-    title: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: '#000000',
-      textAlign: 'center',
-      marginBottom: 20,
-    },
-    input: {
-      height: 50,
-      borderColor: '#CCCCCC',
-      borderWidth: 1,
-      borderRadius: 5,
-      marginBottom: 15,
-      paddingLeft: 10,
-      fontSize: 16,
-      color: '#000000',
-    },
-    photoButton: {
-      backgroundColor: '#4CAF50',
-      padding: 10,
-      borderRadius: 5,
-      marginBottom: 15,
-      alignItems: 'center',
-    },
-    photoButtonText: {
-      color: '#FFFFFF',
-      fontSize: 16,
-    },
-    image: {
-      width: width - 200,
-      height: width - 200, // Ensure the height equals the width to maintain a circle
-      borderRadius: (width - 40) / 2, // Half of the width to make it circular
-      marginBottom: 15,
-      alignSelf: 'center',
-    },
-    submitButton: {
-      padding: 15,
-      borderRadius: 5,
-      alignItems: 'center',
-    },
-    submitButtonText: {
-      color: 'gray',
-      fontSize: 18,
-      fontWeight: 'bold',
-    },
-    emergencyContactContainer: {
-      marginBottom: 15,
-    },
-    addButton: {
-      backgroundColor: '#2196F3',
-      padding: 10,
-      borderRadius: 5,
-      marginBottom: 15,
-      alignItems: 'center',
-    },
-    addButtonText: {
-      color: '#FFFFFF',
-      fontSize: 16,
-    },
-    removeButton: {
-      backgroundColor: '#FF6347',
-      padding: 5,
-      borderRadius: 5,
-      marginTop: 5,
-      alignItems: 'center',
-    },
-    removeButtonText: {
-      color: '#FFFFFF',
-      fontSize: 14,
-    },
-  });
-  
+  container: { flex: 1 },
+  scrollContainer: { padding: 20 },
+  title: { fontSize: 24, fontWeight: 'bold', color: '#6A5ACD', textAlign: 'center', marginBottom: 20 },
+  roundImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 100,
+    alignSelf: 'center',
+    borderWidth: 2,
+    borderColor: '#BA55D3',
+    marginBottom: 20,
+  },
+  input: { marginBottom: 15, backgroundColor: 'white' },
+  contactContainer: { marginBottom: 10 },
+  removeButton: { fontSize: 16, color: 'red', textAlign: 'right' },
+  addButton: { marginVertical: 10, backgroundColor: '#6A5ACD' },
+  submitButton: { marginTop: 10, backgroundColor: '#6A5ACD' },
+});
+
 export default DaughterLogin;

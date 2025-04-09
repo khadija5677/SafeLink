@@ -50,7 +50,7 @@ const ParentDashboard = ({ navigation }) => {
 
           <TouchableOpacity
             style={styles.card}
-            onPress={() => navigation.navigate('TContacts')}
+            onPress={() => navigation.navigate('TrustedContacts')}
           >
             <Text style={styles.cardText}>📞 Add Trusted Contacts</Text>
           </TouchableOpacity>

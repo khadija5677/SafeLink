@@ -21,9 +21,9 @@ const LoginSelectionScreen = ({ navigation }) => {
 
   const handleNextPress = () => {
     if (selectedOption === 'daughter') {
-      navigation.navigate('DaughterLoginScreen');
+      navigation.navigate('DaughterLogin');
     } else if (selectedOption === 'parent') {
-      navigation.navigate('ParentLoginScreen');
+      navigation.navigate('ParentLogin');
     }
   };
 
