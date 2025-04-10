@@ -15,21 +15,31 @@ import { ProfileContext } from '../../context/ProfileContext';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Feather';
 
-const Profile = () => {
-  const navigation = useNavigation();
+const Profile = ({ navigation }) => {
   const { profileData, setProfileData } = useContext(ProfileContext);
   const [editable, setEditable] = useState(false);
 
-  const [localData, setLocalData] = useState(profileData);
+  // Use fallback to prevent null errors
+  const initialData = profileData || {
+    fullName: '',
+    address: '',
+    email: '',
+    yourContact: '',
+    age: '',
+    photo: null,
+    emergencyContacts: ['', ''],
+  };
+
+  const [localData, setLocalData] = useState(initialData);
 
   const handleInputChange = (field, value) => {
     setLocalData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleContactChange = (index, value) => {
-    const updatedContacts = [...localData.emergencyContacts];
-    updatedContacts[index].number = value;
-    setLocalData(prev => ({ ...prev, emergencyContacts: updatedContacts }));
+    const updated = [...localData.emergencyContacts];
+    updated[index] = value;
+    setLocalData(prev => ({ ...prev, emergencyContacts: updated }));
   };
 
   const handleSave = () => {
@@ -70,7 +80,6 @@ const Profile = () => {
   return (
     <LinearGradient colors={['#E6E6FA', '#BA55D3']} style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        {/* Home Icon */}
         <TouchableOpacity style={styles.homeIcon} onPress={() => navigation.navigate('DaughterDashboard')}>
           <Icon name="home" size={24} color="#6A0DAD" />
         </TouchableOpacity>
@@ -87,16 +96,9 @@ const Profile = () => {
         </TouchableOpacity>
 
         <TextInput
-          label="Name"
-          value={localData.name}
-          onChangeText={text => handleInputChange('name', text)}
-          style={styles.input}
-          editable={editable}
-        />
-        <TextInput
-          label="Father's Name"
-          value={localData.fatherName}
-          onChangeText={text => handleInputChange('fatherName', text)}
+          label="Full Name"
+          value={localData.fullName}
+          onChangeText={text => handleInputChange('fullName', text)}
           style={styles.input}
           editable={editable}
         />
@@ -115,13 +117,6 @@ const Profile = () => {
           editable={editable}
         />
         <TextInput
-          label="Blood Group"
-          value={localData.bloodGroup}
-          onChangeText={text => handleInputChange('bloodGroup', text)}
-          style={styles.input}
-          editable={editable}
-        />
-        <TextInput
           label="Your Contact"
           value={localData.yourContact}
           onChangeText={text => handleInputChange('yourContact', text)}
@@ -135,27 +130,13 @@ const Profile = () => {
           style={styles.input}
           editable={editable}
         />
-        <TextInput
-          label="Height (cm)"
-          value={localData.height}
-          onChangeText={text => handleInputChange('height', text)}
-          style={styles.input}
-          editable={editable}
-        />
-        <TextInput
-          label="Weight (kg)"
-          value={localData.weight}
-          onChangeText={text => handleInputChange('weight', text)}
-          style={styles.input}
-          editable={editable}
-        />
 
         <Text style={styles.sectionTitle}>Emergency Contacts</Text>
-        {localData.emergencyContacts?.map((contact, index) => (
+        {localData.emergencyContacts?.map((number, index) => (
           <TextInput
             key={index}
             label={`Emergency Contact ${index + 1}`}
-            value={contact.number}
+            value={number}
             onChangeText={text => handleContactChange(index, text)}
             style={styles.input}
             editable={editable}

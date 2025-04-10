@@ -1,25 +1,18 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert, Image, ScrollView } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { TextInput, Button } from 'react-native-paper';
-import { ProfileContext } from '../context/ProfileContext';
 
 const { width } = Dimensions.get('window');
 
 const DaughterLogin = ({ navigation }) => {
-  const { setProfileData } = useContext(ProfileContext);
-
   const [formData, setFormData] = useState({
-    name: '',
-    fatherName: '',
+    fullName: '',
     address: '',
     email: '',
-    bloodGroup: '',
     yourContact: '',
     age: '',
-    height: '',
-    weight: '',
     photo: null,
   });
 
@@ -31,17 +24,13 @@ const DaughterLogin = ({ navigation }) => {
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
   useEffect(() => {
-    const requiredFields = ['name', 'fatherName', 'address', 'email', 'bloodGroup', 'yourContact', 'photo'];
-    const areRequiredFieldsFilled = requiredFields.every(field => {
-      const value = formData[field];
-      return value && value.toString().trim() !== '';
-    });
-  
-    const areContactsFilled = emergencyContacts.every(contact => contact.number.trim() !== '');
-  
-    setIsButtonEnabled(areRequiredFieldsFilled && areContactsFilled);
+    const requiredFields = ['fullName', 'address', 'email', 'yourContact', 'age'];
+    const isValid =
+      requiredFields.every(key => formData[key]?.trim() !== '') &&
+      emergencyContacts.every(contact => contact.number.trim() !== '');
+
+    setIsButtonEnabled(isValid);
   }, [formData, emergencyContacts]);
-  
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -57,51 +46,45 @@ const DaughterLogin = ({ navigation }) => {
 
   const openCamera = () => {
     launchCamera({ mediaType: 'photo', quality: 0.8 }, response => {
-      if (response.didCancel || !response.assets?.length) return;
-      handleInputChange('photo', response.assets[0].uri);
+      if (!response.didCancel && response.assets?.length > 0) {
+        handleInputChange('photo', response.assets[0].uri);
+      }
     });
   };
 
   const openGallery = () => {
     launchImageLibrary({ mediaType: 'photo', quality: 0.8 }, response => {
-      if (response.didCancel || !response.assets?.length) return;
-      handleInputChange('photo', response.assets[0].uri);
+      if (!response.didCancel && response.assets?.length > 0) {
+        handleInputChange('photo', response.assets[0].uri);
+      }
     });
   };
 
   const addEmergencyContact = () => {
-    setEmergencyContacts([...emergencyContacts, { id: Date.now(), number: '' }]);
+    setEmergencyContacts(prev => [...prev, { id: Date.now(), number: '' }]);
   };
 
   const removeEmergencyContact = id => {
     if (emergencyContacts.length > 2) {
-      setEmergencyContacts(emergencyContacts.filter(contact => contact.id !== id));
+      setEmergencyContacts(prev => prev.filter(contact => contact.id !== id));
     }
   };
 
   const handleSubmit = () => {
     if (!isButtonEnabled) {
-      Alert.alert('Error', 'Please fill in all required fields.');
+      Alert.alert('Error', 'Please fill all required fields.');
       return;
     }
-  
-    // ✅ Basic Email Format Validation
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address.');
-      return;
-    }
-  
-    // Save to global context
-    setProfileData({ ...formData, emergencyContacts });
-  
-    Alert.alert('Success', 'Profile Updated Successfully!', [
-      {
-        text: 'OK',
-        onPress: () => navigation.replace('DaughterDashboard'),
-      },
-    ]);
+
+    const finalData = {
+      ...formData,
+      emergencyContacts: emergencyContacts.map(c => c.number),
+    };
+
+    //navigation.navigate('Profile', { userData: finalData });
+    navigation.navigate('DaughterDashboard');
+    Alert.alert('Success', 'Login successful!');
   };
-  
 
   return (
     <LinearGradient colors={['#E6E6FA', '#BA55D3']} style={styles.container}>
@@ -113,22 +96,49 @@ const DaughterLogin = ({ navigation }) => {
             source={
               formData.photo
                 ? { uri: formData.photo }
-                : require('../../assets/images/image.png')
+                : require('../../assets/images/default-profile.png')
             }
             style={styles.roundImage}
-            resizeMode="cover"
           />
         </TouchableOpacity>
 
-        <TextInput label="Name *" value={formData.name} onChangeText={text => handleInputChange('name', text)} style={styles.input} />
-        <TextInput label="Father's Name *" value={formData.fatherName} onChangeText={text => handleInputChange('fatherName', text)} style={styles.input} />
-        <TextInput label="Address *" value={formData.address} onChangeText={text => handleInputChange('address', text)} style={styles.input} />
-        <TextInput label="Email *" value={formData.email} onChangeText={text => handleInputChange('email', text)} keyboardType="email-address" autoCapitalize="none" style={styles.input} />
-        <TextInput label="Blood Group *" value={formData.bloodGroup} onChangeText={text => handleInputChange('bloodGroup', text)} style={styles.input} />
-        <TextInput label="Your Contact *" value={formData.yourContact} onChangeText={text => handleInputChange('yourContact', text)} keyboardType="phone-pad" style={styles.input} />
-        <TextInput label="Age" value={formData.age} onChangeText={text => handleInputChange('age', text)} keyboardType="numeric" style={styles.input} />
-        <TextInput label="Height (in cm)" value={formData.height} onChangeText={text => handleInputChange('height', text)} keyboardType="numeric" style={styles.input} />
-        <TextInput label="Weight (in kg)" value={formData.weight} onChangeText={text => handleInputChange('weight', text)} keyboardType="numeric" style={styles.input} />
+        <TextInput
+          label="Full Name *"
+          value={formData.fullName}
+          onChangeText={text => handleInputChange('fullName', text)}
+          style={styles.input}
+        />
+
+        <TextInput
+          label="Address *"
+          value={formData.address}
+          onChangeText={text => handleInputChange('address', text)}
+          style={styles.input}
+        />
+
+        <TextInput
+          label="Email *"
+          value={formData.email}
+          onChangeText={text => handleInputChange('email', text)}
+          keyboardType="email-address"
+          style={styles.input}
+        />
+
+        <TextInput
+          label="Your Contact *"
+          value={formData.yourContact}
+          onChangeText={text => handleInputChange('yourContact', text)}
+          keyboardType="phone-pad"
+          style={styles.input}
+        />
+
+        <TextInput
+          label="Age *"
+          value={formData.age}
+          onChangeText={text => handleInputChange('age', text)}
+          keyboardType="numeric"
+          style={styles.input}
+        />
 
         {emergencyContacts.map((contact, index) => (
           <View key={contact.id} style={styles.contactContainer}>
@@ -178,7 +188,7 @@ const styles = StyleSheet.create({
   },
   input: { marginBottom: 15, backgroundColor: 'white' },
   contactContainer: { marginBottom: 10 },
-  removeButton: { fontSize: 16, color: 'red', textAlign: 'right' },
+  removeButton: { fontSize: 16, color: 'red', marginTop: -10 },
   addButton: { marginVertical: 10, backgroundColor: '#6A5ACD' },
   submitButton: { marginTop: 10, backgroundColor: '#6A5ACD' },
 });

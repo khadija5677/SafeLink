@@ -27,15 +27,51 @@ const ParentLogin = ({ navigation }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+  //const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-  const sendVerificationCode = () => {
+  // const sendVerificationCode = () => {
+  //   if (!validateFields()) return;
+  //   const code = generateCode();
+  //   setSentCode(code);
+  //   setIsCodeSent(true);
+  //   Alert.alert('Verification Code Sent', `Your code is: ${code}`);
+  // };
+
+  const sendVerificationCode = async () => {
     if (!validateFields()) return;
-    const code = generateCode();
-    setSentCode(code);
-    setIsCodeSent(true);
-    Alert.alert('Verification Code Sent', `Your code is: ${code}`);
+  
+    try {
+      const response = await fetch("http://192.168.13.144:3000/parent/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          relation,
+          email,
+          contactDetails,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        setIsCodeSent(true);
+        setSentCode(data.verificationCode || '000000'); // if you return code in response
+        Alert.alert("Verification Code Sent", "Please check your email or use dummy code.");
+      } else {
+        Alert.alert("Error", data.error || "Something went wrong.");
+      }
+    } catch (err) {
+      console.error("Error:", err.message);
+      Alert.alert("Network Error", "Could not connect to server.");
+    }
   };
+  
+
+
+
 
   const verifyCode = () => {
     if (verificationCode === sentCode) {
