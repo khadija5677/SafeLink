@@ -1,27 +1,21 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {Main} from './src/Main';
-import {
-  StyleSheet,
-} from 'react-native';
+import { StyleSheet, View } from 'react-native'; // React Native components
+import AppNavigator from './src/Navigation/AppNavigator'; // Import AppNavigator
 
-const App = () => {
+const App: React.FC = () => {
+  // Styles for React Native
+  const styles = StyleSheet.create({
+    appContainer: {
+      flex: 1,  // Ensure the container takes up the full screen
+    },
+  });
+
   return (
-    <Main />
+    <View style={styles.appContainer}>
+      {/* AppNavigator takes care of the navigation and rendering of screens */}
+      <AppNavigator />
+    </View>
   );
-
-}
- 
-
-const styles = StyleSheet.create({
- 
-});
+};
 
 export default App;

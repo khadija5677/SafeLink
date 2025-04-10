@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "706679416949",
+    "project_id": "safelink-41f97",
+    "storage_bucket": "safelink-41f97.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:706679416949:android:3a00a34368b10a8137f03c",
+        "android_client_info": {
+          "package_name": "com.womensafetyapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCi0ufHcDy2KkSc_1dhcdyTFTATQVmWFes"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
