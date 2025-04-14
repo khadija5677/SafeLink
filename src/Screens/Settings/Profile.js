@@ -57,7 +57,6 @@ const Profile = () => {
       }
     });
   };
-
   const openGallery = () => {
     launchImageLibrary({ mediaType: 'photo', quality: 0.8 }, response => {
       if (!response.didCancel && response.assets?.length) {
